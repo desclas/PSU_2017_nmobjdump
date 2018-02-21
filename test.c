@@ -128,7 +128,8 @@ void print_data(size_t size, unsigned char *data, size_t addr)
 
 int is_pritable(char *str)
 {
-	char tab[100][100] = { ".bss", ".strtab", ".symtab", ".shstrtab", ".rela.text", ".data", ".note.GNU-stack", ".rela.eh_frame", " " };
+	char tab[100][100] = { ".bss", ".strtab", ".symtab", ".shstrtab",
+	".rela.text", ".data", ".note.GNU-stack", ".rela.eh_frame", " " };
 
 	for (size_t i = 0; tab[i][0] != ' '; i++)
 		if (strcmp(tab[i], str) == 0)
@@ -138,13 +139,11 @@ int is_pritable(char *str)
 
 void followSec(void *buf, char *tab, Elf64_Shdr *sec, size_t nb)
 {
-	unsigned char pr[2] = { 194, 160 };
 	for (size_t i = 1; i != nb; i++) {
 		if (is_pritable(&tab[sec[i].sh_name]) == 1) {
-			write(1, "Contenu de la section ", 22);
+			write(1, "Contents of section ", 20);
 			write(1, &tab[sec[i].sh_name],
 				strlen(&tab[sec[i].sh_name]));
-			write(1, pr, 2);
 			write(1, ":\n", 2);
 			print_data(sec[i].sh_size, buf + sec[i].sh_offset,
 				sec[i].sh_addr);
@@ -160,13 +159,14 @@ void followHed(void *buff, Elf64_Phdr *hed, size_t nb)
 	for (size_t x = 0; tab[x][0] != ' '; x++)
 		printf("name = %s = %lu\n", tab[x], nbb[x]);
 
-	Elf64_Shdr *tmp;
 	for (size_t i = 0; i != nb; i++) {
 		printf("vaddr = %lu\n", hed[i].p_vaddr);
 		printf("off = %lu\n", hed[i].p_offset);
+		printf("addr = %p\n", hed[i].p_paddr);
+		printf("vaddr = %p\n", hed[i].p_vaddr);
 		if (hed[i].p_offset != 0) {
-			tmp = buff + hed[i].p_offset;
-			printf("%lu\n", tmp->sh_type);
+			printf("file = %lu\n", hed[i].p_filesz);
+			printf("mem = %lu\n", hed[i].p_memsz);
 		}
 	}
 }
@@ -215,7 +215,6 @@ void startPrint(char *name, void *buf, int *nb)
 {
 	Elf64_Ehdr *elf;
 
-	
 	startReading(buf, nb);
 }
 
@@ -239,6 +238,6 @@ int main(int ac, char **av)
 		close(fd);
 		} else
 			printError(3, "objdump: << ", av[i],
-				" >>: pas de tel fichier\n");
+				" >>: no such file\n");
 	}
 }
