@@ -16,7 +16,7 @@ CFLAGS	=	-W -Wall -Werror -Wextra -Iincludes
 
 OBJ	=	$(SRC:.c=.o)
 
-NAME	=	objdump
+NAME	=	my_objdump
 
 all: $(NAME)
 
